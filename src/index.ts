@@ -1,10 +1,18 @@
-import { serve } from "https://deno.land/std@0.85.0/http/server.ts";
+import { createBot, Intents, startBot } from "https://deno.land/x/discordeno@13.0.0/mod.ts";
 
-let port = parseInt(Deno.env.get("PORT") ?? "8000")
-const s = serve({ port });
+const bot = createBot({
+  token: Deno.env.get("DISCORD_TOKEN"),
+  intents: Intents.Guilds | Intents.GuildMessages,
+  events: {
+    ready() {
+      console.log("Successfully connected to gateway");
+    },
+  },
+});
 
-console.log(`http://localhost:${port}/`);
+// Another way to do events
+bot.events.messageCreate = function (b, message) {
+  // Process the message here with your command handler.
+};
 
-for await (const req of s) {
-  req.respond({ body: "Choo Choo! Welcome to your Deno app\n" });
-}
+await startBot(bot);
